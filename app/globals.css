@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: "Inter", system-ui, -apple-system, sans-serif;
+    color: #111827;
+    background-color: #ffffff;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
+}
+
+/* Dark Mode Grid Overrides */
+.dark {
+  --grid-lvl-0: #1e293b; 
+  --grid-lvl-1: #10b981; 
+  --grid-lvl-2: #059669; 
+  --grid-lvl-3: #047857; 
+}
+
+/* Ultra Dark Mode Overrides (Pure Black AMOLED Theme) */
+.dark.ultra-dark {
+  /* Core Backgrounds */
+  --slate-950: #000000;
+  --slate-900: #000000;
+  
+  /* Cards and Secondary elements */
+  --slate-800: #111111;
+  
+  /* Borders */
+  --slate-700: #1f1f1f;
+  
+  /* Text */
+  --slate-200: #ffffff; /* Primary Text */
+  --slate-400: #a1a1aa; /* Secondary Text */
+  --slate-500: #a1a1aa; /* Icons/Muted */
+  --slate-600: #a1a1aa; /* Placeholder */
+  
+  /* Subtle glow mapping for active states */
+  --glow-color: rgba(99, 102, 241, 0.4); 
+
+  /* Contribution Grid - Premium Indigo Scale Map */
+  --grid-lvl-0: #0a0a0a;   /* Empty */
+  --grid-lvl-1: #1f2937;   /* Low */
+  --grid-lvl-2: #4f46e5;   /* Medium */
+  --grid-lvl-3: #6366f1;   /* High */
+}
+
+.dark.ultra-dark body {
+  background-color: var(--slate-900);
+}
