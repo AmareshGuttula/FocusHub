@@ -108,8 +108,8 @@ export default function PomodoroPage() {
 
         {/* Timer display with circle */}
         <div className="flex flex-col items-center py-10">
-          <div className="relative flex h-72 w-72 items-center justify-center">
-            <svg className="absolute -rotate-90" width="288" height="288" viewBox="0 0 288 288">
+          <div className="relative flex h-52 w-52 lg:h-72 lg:w-72 items-center justify-center">
+            <svg className="absolute -rotate-90 w-full h-full" viewBox="0 0 288 288">
               {/* Background ring */}
               <circle cx="144" cy="144" r={radius} fill="none" stroke="currentColor" className="text-[#f3f4f6] dark:text-slate-800 transition-colors duration-300" strokeWidth="6" />
               {/* Progress ring */}
@@ -127,7 +127,7 @@ export default function PomodoroPage() {
               />
             </svg>
             <div className="text-center">
-              <span className="text-6xl font-bold text-[#111827] dark:text-white tabular-nums tracking-tight transition-colors duration-300">
+              <span className="text-5xl lg:text-6xl font-bold text-[#111827] dark:text-white tabular-nums tracking-tight transition-colors duration-300">
                 {String(mins).padStart(2, "0")}:{String(secs).padStart(2, "0")}
               </span>
               <p className="mt-2 text-sm text-[#6b7280] dark:text-slate-400 transition-colors duration-300">
@@ -138,7 +138,7 @@ export default function PomodoroPage() {
         </div>
 
         {/* Controls */}
-        <div className="flex items-center justify-center gap-3 border-t border-[#f3f4f6] dark:border-slate-800 px-5 py-4 transition-colors duration-300">
+        <div className="flex items-center justify-center gap-3 border-t border-[#f3f4f6] dark:border-slate-800 px-4 lg:px-5 py-4 transition-colors duration-300">
           <button
             onClick={reset}
             className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#e5e7eb] dark:border-slate-700 text-[#6b7280] dark:text-slate-400 transition-colors hover:bg-[#f7f7f8] dark:hover:bg-slate-800 hover:text-[#111827] dark:hover:text-slate-200"
@@ -148,7 +148,7 @@ export default function PomodoroPage() {
           </button>
           <button
             onClick={() => setIsRunning(!isRunning)}
-            className="flex h-10 items-center gap-2 rounded-lg bg-[#4f46e5] px-8 text-sm font-medium text-white transition-colors hover:bg-[#4338ca] shadow-sm shadow-[#4f46e5]/20"
+            className="flex h-10 items-center gap-2 rounded-lg bg-[#4f46e5] px-6 lg:px-8 text-sm font-medium text-white transition-colors hover:bg-[#4338ca] shadow-sm shadow-[#4f46e5]/20 min-h-[44px]"
           >
             {isRunning ? (
               <>
@@ -186,7 +186,7 @@ export default function PomodoroPage() {
 
       {/* Sessions counter */}
       {!isFocusMode && (
-        <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 px-5 py-4 shadow-soft text-center w-full transition-colors duration-300">
+        <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 lg:px-5 py-4 shadow-soft text-center w-full transition-colors duration-300">
           <p className="text-xs font-medium uppercase tracking-wider text-[#6b7280] dark:text-slate-400">
             Sessions completed today
           </p>

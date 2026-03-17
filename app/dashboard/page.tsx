@@ -63,7 +63,7 @@ export default function DashboardPage() {
   }, []);
 
   return (
-    <div className="mx-auto max-w-6xl space-y-8">
+    <div className="mx-auto max-w-6xl space-y-6 lg:space-y-8">
       {/* Stat cards */}
       <DashboardCards />
 

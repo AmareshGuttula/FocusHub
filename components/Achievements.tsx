@@ -26,7 +26,7 @@ export default function Achievements({ achievements }: AchievementsProps) {
   const locked = achievements.filter((a) => !a.achievedAt);
 
   return (
-    <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-soft transition-colors duration-300">
+    <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 lg:p-5 shadow-soft transition-colors duration-300">
       <h3 className="text-sm font-semibold text-[#111827] dark:text-slate-200 mb-4 transition-colors duration-300">
         🏆 Achievements
       </h3>

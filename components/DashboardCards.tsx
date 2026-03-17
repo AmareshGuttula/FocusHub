@@ -43,7 +43,7 @@ export default function DashboardCards() {
         return (
           <div
             key={card.title}
-            className="group rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-soft transition-all duration-200 hover:shadow-card hover:border-[#d1d5db] dark:hover:border-slate-700"
+            className="group rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 lg:p-5 shadow-soft transition-all duration-200 hover:shadow-card hover:border-[#d1d5db] dark:hover:border-slate-700"
           >
             <div className="flex items-start justify-between">
               <p className="text-xs font-medium uppercase tracking-wider text-[#6b7280] dark:text-slate-400">

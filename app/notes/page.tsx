@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Search, Trash2, FileText } from "lucide-react";
+import { Plus, Search, Trash2, FileText, ArrowLeft } from "lucide-react";
 
 interface Note {
   id: number;
@@ -38,6 +38,8 @@ export default function NotesPage() {
   const [notes, setNotes] = useState<Note[]>(initialNotes);
   const [activeId, setActiveId] = useState<number>(initialNotes[0].id);
   const [search, setSearch] = useState("");
+  // Mobile: toggle between list view and editor view
+  const [mobileShowEditor, setMobileShowEditor] = useState(false);
 
   const activeNote = notes.find((n) => n.id === activeId);
 
@@ -54,14 +56,25 @@ export default function NotesPage() {
     };
     setNotes((prev) => [newNote, ...prev]);
     setActiveId(newNote.id);
+    setMobileShowEditor(true);
   };
 
   const deleteNote = (id: number) => {
     setNotes((prev) => prev.filter((n) => n.id !== id));
     if (activeId === id) {
       const remaining = notes.filter((n) => n.id !== id);
-      setActiveId(remaining.length > 0 ? remaining[0].id : -1);
+      if (remaining.length > 0) {
+        setActiveId(remaining[0].id);
+      } else {
+        setActiveId(-1);
+        setMobileShowEditor(false);
+      }
     }
+  };
+
+  const selectNote = (id: number) => {
+    setActiveId(id);
+    setMobileShowEditor(true);
   };
 
   const updateTitle = (title: string) => {
@@ -82,8 +95,8 @@ export default function NotesPage() {
 
   return (
     <div className="mx-auto flex h-[calc(100vh-56px-48px)] max-w-6xl gap-4">
-      {/* Left — Notes list */}
-      <div className="flex w-64 flex-shrink-0 flex-col rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft">
+      {/* Left — Notes list (hidden on mobile when editor is active) */}
+      <div className={`flex w-full lg:w-64 flex-shrink-0 flex-col rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft ${mobileShowEditor ? "hidden lg:flex" : "flex"}`}>
         {/* Search + New */}
         <div className="border-b border-[#f3f4f6] dark:border-slate-800/50 p-3 space-y-2">
           <div className="relative">
@@ -97,7 +110,7 @@ export default function NotesPage() {
           </div>
           <button
             onClick={createNote}
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#4f46e5] py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#4338ca]"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-[#4f46e5] py-2 lg:py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#4338ca] min-h-[44px] lg:min-h-0"
           >
             <Plus className="h-3.5 w-3.5" />
             New Note
@@ -114,8 +127,8 @@ export default function NotesPage() {
           {filtered.map((note) => (
             <div
               key={note.id}
-              onClick={() => setActiveId(note.id)}
-              className={`group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left cursor-pointer transition-colors mb-0.5 ${
+              onClick={() => selectNote(note.id)}
+              className={`group flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2.5 lg:py-2 text-left cursor-pointer transition-colors mb-0.5 min-h-[44px] lg:min-h-0 ${
                 activeId === note.id
                   ? "bg-[#4f46e5]/[0.08] dark:bg-indigo-500/20 text-[#4f46e5]"
                   : "text-[#111827] dark:text-slate-200 hover:bg-[#f7f7f8] dark:hover:bg-slate-800"
@@ -137,7 +150,7 @@ export default function NotesPage() {
                   e.stopPropagation();
                   deleteNote(note.id);
                 }}
-                className="mt-0.5 text-[#d1d5db] dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ef4444] dark:hover:text-red-400"
+                className="mt-0.5 text-[#d1d5db] dark:text-slate-500 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity hover:text-[#ef4444] dark:hover:text-red-400"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -146,12 +159,20 @@ export default function NotesPage() {
         </div>
       </div>
 
-      {/* Right — Editor */}
-      <div className="flex flex-1 flex-col rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft">
+      {/* Right — Editor (hidden on mobile when list is active) */}
+      <div className={`flex flex-1 flex-col rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft ${mobileShowEditor ? "flex" : "hidden lg:flex"}`}>
         {activeNote ? (
           <>
             {/* Title */}
-            <div className="border-b border-[#f3f4f6] dark:border-slate-800/50 px-6 py-4">
+            <div className="border-b border-[#f3f4f6] dark:border-slate-800/50 px-4 lg:px-6 py-4">
+              {/* Back button — mobile only */}
+              <button
+                onClick={() => setMobileShowEditor(false)}
+                className="flex items-center gap-1.5 text-sm text-[#6b7280] dark:text-slate-400 mb-3 hover:text-[#111827] dark:hover:text-slate-200 transition-colors lg:hidden min-h-[44px]"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back to notes
+              </button>
               <input
                 value={activeNote.title}
                 onChange={(e) => updateTitle(e.target.value)}
@@ -168,7 +189,7 @@ export default function NotesPage() {
               value={activeNote.content}
               onChange={(e) => updateContent(e.target.value)}
               placeholder="Start writing..."
-              className="flex-1 w-full bg-transparent resize-none px-6 py-4 text-sm leading-relaxed text-[#111827] dark:text-slate-200 placeholder-[#d1d5db] dark:placeholder-slate-600 outline-none"
+              className="flex-1 w-full bg-transparent resize-none px-4 lg:px-6 py-4 text-sm leading-relaxed text-[#111827] dark:text-slate-200 placeholder-[#d1d5db] dark:placeholder-slate-600 outline-none"
             />
           </>
         ) : (

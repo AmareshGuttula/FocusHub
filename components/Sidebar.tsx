@@ -38,7 +38,7 @@ export default function Sidebar() {
   const { profile, openProfile } = useUser();
 
   return (
-    <aside className="fixed left-0 top-0 z-40 flex h-screen w-[260px] flex-col border-r border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300">
+    <aside className="fixed left-0 top-0 z-40 hidden lg:flex h-screen w-[260px] flex-col border-r border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors duration-300">
       {/* Logo */}
       <div className="flex h-[60px] items-center gap-2.5 px-5">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4f46e5]">

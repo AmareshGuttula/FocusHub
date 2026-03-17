@@ -236,7 +236,7 @@ export default function TasksPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#9ca3af] dark:text-slate-400" />
           <input
@@ -372,10 +372,10 @@ export default function TasksPage() {
                     onDragEnd={handleDragEnd}
                     className={`group flex items-center gap-2.5 px-4 py-3 transition-colors cursor-grab active:cursor-grabbing ${isAnimating ? "" : "hover:bg-[#fafafa] dark:hover:bg-slate-800"}`}
                   >
-                    <GripVertical className="h-3.5 w-3.5 flex-shrink-0 text-[#d1d5db] opacity-0 group-hover:opacity-100 transition-opacity" />
+                    <GripVertical className="h-3.5 w-3.5 flex-shrink-0 text-[#d1d5db] opacity-0 group-hover:opacity-100 transition-opacity hidden lg:block" />
 
                     {/* Checkbox */}
-                    <button onClick={() => toggle(task.id)} className="flex-shrink-0">
+                    <button onClick={() => toggle(task.id)} className="flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center lg:min-h-0 lg:min-w-0">
                       {task.done ? (
                         <CheckCircle2 className="h-[18px] w-[18px] text-[#4f46e5]" />
                       ) : (
@@ -429,10 +429,10 @@ export default function TasksPage() {
                     </button>
 
                     {/* Actions */}
-                    <button onClick={() => { setEditingId(task.id); setEditText(task.text); }} className="text-[#d1d5db] dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-all hover:text-[#4f46e5] flex-shrink-0">
+                    <button onClick={() => { setEditingId(task.id); setEditText(task.text); }} className="text-[#d1d5db] dark:text-slate-500 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all hover:text-[#4f46e5] flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center lg:min-h-0 lg:min-w-0">
                       <Pencil className="h-3.5 w-3.5" />
                     </button>
-                    <button onClick={() => remove(task.id)} className="text-[#d1d5db] dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-all hover:text-[#ef4444] flex-shrink-0">
+                    <button onClick={() => remove(task.id)} className="text-[#d1d5db] dark:text-slate-500 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-all hover:text-[#ef4444] flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center lg:min-h-0 lg:min-w-0">
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
                   </div>

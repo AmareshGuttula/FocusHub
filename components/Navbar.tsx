@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Search, Bell, CheckCircle2, AlertTriangle, Info, Clock, Moon, Sun } from "lucide-react";
+import { Search, Bell, CheckCircle2, AlertTriangle, Info, Clock, Moon, Sun, Menu } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
 
 interface Notification {
@@ -74,15 +74,28 @@ export default function Navbar() {
     }
   };
 
+  // Dispatch custom event for MobileShell to open drawer
+  const handleHamburgerClick = () => {
+    window.dispatchEvent(new CustomEvent("open-mobile-drawer"));
+  };
+
   return (
-    <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between border-b border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 px-6 transition-colors duration-300">
-      {/* Left — Page title */}
-      <h1 className="text-base font-semibold text-[#111827] dark:text-white transition-colors duration-300">{title}</h1>
+    <header className="sticky top-0 z-30 flex h-[56px] items-center justify-between border-b border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 px-4 lg:px-6 transition-colors duration-300">
+      {/* Left — Hamburger (mobile) + Page title */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={handleHamburgerClick}
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-[#6b7280] dark:text-slate-400 hover:bg-[#f7f7f8] dark:hover:bg-slate-800 hover:text-[#111827] dark:hover:text-slate-200 transition-colors lg:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+        <h1 className="text-base font-semibold text-[#111827] dark:text-white transition-colors duration-300">{title}</h1>
+      </div>
 
       {/* Right — Actions */}
-      <div className="flex items-center gap-3">
-        {/* Search bar */}
-        <div className="relative">
+      <div className="flex items-center gap-2 lg:gap-3">
+        {/* Search bar — hidden on mobile */}
+        <div className="relative hidden lg:block">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9ca3af] dark:text-slate-400" />
           <input
             type="text"
@@ -119,7 +132,7 @@ export default function Navbar() {
 
           {/* Dropdown Panel */}
           {showDropdown && (
-            <div className="absolute right-0 mt-2 w-80 origin-top-right rounded-xl border border-[#e5e7eb] dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg focus:outline-none">
+            <div className="absolute right-0 mt-2 w-80 max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-[#e5e7eb] dark:border-slate-700 bg-white dark:bg-slate-800 shadow-lg focus:outline-none">
               <div className="flex items-center justify-between border-b border-[#f3f4f6] dark:border-slate-700 px-4 py-3">
                 <h3 className="text-sm font-semibold text-[#111827] dark:text-slate-200">Notifications</h3>
                 {unreadCount > 0 && (

@@ -20,7 +20,7 @@ export default function StreakCard({ currentStreak, longestStreak }: StreakCardP
   }, [currentStreak]);
 
   return (
-    <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-soft transition-colors duration-300">
+    <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 lg:p-5 shadow-soft transition-colors duration-300">
       <div className="flex items-center gap-4">
         {/* Fire icon with animation */}
         <div className="relative">

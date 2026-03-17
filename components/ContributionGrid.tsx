@@ -49,7 +49,7 @@ export default function ContributionGrid({ activities }: ContributionGridProps) 
   };
 
   return (
-    <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-soft transition-colors duration-300">
+    <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-4 lg:p-5 shadow-soft transition-colors duration-300">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-[#111827] dark:text-slate-200 transition-colors duration-300">Contribution Activity</h3>
         {/* Legend */}
@@ -66,7 +66,7 @@ export default function ContributionGrid({ activities }: ContributionGridProps) 
         </div>
       </div>
 
-      <div className="relative overflow-x-auto">
+      <div className="relative overflow-x-auto touch-scroll">
         <div className="flex gap-[3px]">
           {/* Day labels */}
           <div className="flex flex-col gap-[3px] mr-1 pt-0">
