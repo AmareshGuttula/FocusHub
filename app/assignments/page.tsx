@@ -83,11 +83,6 @@ export default function AssignmentsPage() {
                       </div>
                     )}
                   </div>
-                    <ClipboardList
-                      className="h-4 w-4"
-                      style={{ color: subjectColor }}
-                    />
-                  </div>
                   <div>
                     <h3 className="text-sm font-semibold text-[#111827] dark:text-slate-200 transition-colors">
                       {a.title}
