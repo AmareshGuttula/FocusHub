@@ -22,14 +22,13 @@ export default function Onboarding() {
   const [wantsPassword, setWantsPassword] = useState<boolean | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [completing, setCompleting] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   if (!mounted) return null;
 
-  // Don't show onboarding if already onboarded or logged in (unless in completing state)
-  if (!completing && (profile.isOnboarded || profile.isLoggedIn)) return null;
+  // Don't show onboarding if already onboarded or logged in
+  if (profile.isOnboarded || profile.isLoggedIn) return null;
 
   const currentStep = steps[step];
 
@@ -68,10 +67,6 @@ export default function Onboarding() {
       return;
     }
 
-    // Show success animation briefly as we redirect
-    setCompleting(true);
-    setStep(4);
-    
     // Execute signup and redirect instantly
     await signup(name.trim(), email.trim(), pw);
     router.push("/dashboard");
