@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useUser } from "@/contexts/UserContext";
+import { supabase } from "@/lib/supabase";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -18,6 +19,9 @@ import {
   LogOut,
   Sparkles,
   X,
+  CalendarDays, // Added for Study Planner
+  FileCheck, // Added for Exams
+  CreditCard,
 } from "lucide-react";
 
 const navItems = [
@@ -27,9 +31,9 @@ const navItems = [
   { label: "Notes", href: "/notes", icon: StickyNote },
   { label: "Saved Links", href: "/links", icon: Bookmark },
   { label: "Flashcards", href: "/flashcards", icon: Layers },
-  { label: "Study Planner", href: "/planner", icon: CalendarRange },
+  { label: "Study Planner", href: "/planner", icon: CalendarDays }, // Changed icon
   { label: "Assignments", href: "/assignments", icon: ClipboardList },
-  { label: "Exams", href: "/exams", icon: GraduationCap },
+  { label: "Exams", href: "/exams", icon: FileCheck }, // Changed icon
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
   { label: "Settings", href: "/settings", icon: Settings },
 ];
@@ -41,7 +45,7 @@ interface MobileDrawerProps {
 
 export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
   const pathname = usePathname();
-  const { profile, openProfile } = useUser();
+  const { profile, openProfile, openPricingModal } = useUser();
 
   return (
     <>
@@ -120,7 +124,18 @@ export default function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
             </div>
           </div>
 
-          <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] dark:text-slate-400 transition-all duration-200 hover:bg-[#fef2f2] dark:hover:bg-red-500/10 hover:text-[#ef4444] dark:hover:text-red-400 min-h-[44px]">
+          <button 
+            onClick={() => { openPricingModal(); onClose(); }}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] dark:text-slate-400 transition-all duration-200 hover:bg-[#f7f7f8] dark:hover:bg-slate-800 hover:text-[#111827] dark:hover:text-slate-200 min-h-[44px]"
+          >
+            <CreditCard className="h-[18px] w-[18px] flex-shrink-0" />
+            <span>Pricing</span>
+          </button>
+
+          <button 
+            onClick={() => { supabase.auth.signOut(); onClose(); }}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b7280] dark:text-slate-400 transition-all duration-200 hover:bg-[#fef2f2] dark:hover:bg-red-500/10 hover:text-[#ef4444] dark:hover:text-red-400 min-h-[44px]"
+          >
             <LogOut className="h-[18px] w-[18px] flex-shrink-0" />
             <span>Logout</span>
           </button>

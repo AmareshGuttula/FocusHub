@@ -3,8 +3,13 @@ import "./globals.css";
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import { UserProvider } from "@/contexts/UserContext";
+import { PomodoroProvider } from "@/contexts/PomodoroContext";
 import ProfileModal from "@/components/ProfileModal";
 import MobileShell from "@/components/MobileShell";
+import Onboarding from "@/components/Onboarding";
+import LoginModal from "@/components/LoginModal";
+import PricingModal from "@/components/PricingModal";
+import PomodoroWidget from "@/components/PomodoroWidget";
 
 export const metadata: Metadata = {
   title: "FocusHub — Student Productivity Dashboard",
@@ -18,18 +23,22 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full w-full">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
-      <body className="bg-white dark:bg-slate-950 text-[#111827] dark:text-slate-200 antialiased transition-colors duration-300">
+      <body className="bg-white dark:bg-slate-950 text-[#111827] dark:text-slate-200 antialiased transition-colors duration-300 h-full w-full flex overflow-hidden">
         <UserProvider>
-          <div className="flex h-screen overflow-hidden">
+          <PomodoroProvider>
+          {/* Main Layout Wrapper */}
+          <div className="flex h-screen w-full overflow-hidden bg-[#f7f7f8] dark:bg-slate-950">
             {/* Sidebar — hidden on mobile */}
-            <Sidebar />
+            <div className="hidden lg:block h-full z-40 relative">
+               <Sidebar />
+            </div>
 
-            {/* Main */}
-            <div className="flex flex-1 flex-col ml-0 lg:ml-[260px]">
+            {/* Main Content */}
+            <div className="flex flex-1 flex-col h-full overflow-hidden">
               <Navbar />
               <main className="flex-1 overflow-y-auto bg-[#f7f7f8] dark:bg-slate-950 p-4 lg:p-6 pb-20 lg:pb-6 transition-colors duration-300">
                 {children}
@@ -37,12 +46,16 @@ export default function RootLayout({
             </div>
           </div>
 
-          {/* Mobile navigation components */}
           <MobileShell />
-          
           <ProfileModal />
+          <Onboarding />
+          <LoginModal />
+          <PricingModal />
+          <PomodoroWidget />
+          </PomodoroProvider>
         </UserProvider>
       </body>
     </html>
   );
 }
+

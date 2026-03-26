@@ -30,8 +30,8 @@ export default function StreakCard({ currentStreak, longestStreak }: StreakCardP
             }`}
           >
             <Flame
-              className={`h-7 w-7 text-[#f97316] transition-all duration-500 shadow-glow ${
-                animate ? "drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]" : ""
+              className={`h-7 w-7 text-[#f97316] transition-all duration-500 drop-shadow-[0_0_12px_rgba(249,115,22,0.5)] ${
+                animate ? "drop-shadow-[0_0_16px_rgba(249,115,22,0.8)]" : ""
               }`}
               style={
                 currentStreak > 0

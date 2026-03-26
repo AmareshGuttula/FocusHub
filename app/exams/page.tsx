@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2, GraduationCap, Calendar, X, Clock } from "lucide-react";
+import { Plus, Trash2, GraduationCap, Calendar, X, Clock, Lock } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 
 interface Exam {
   id: number;
@@ -34,12 +35,17 @@ const initialExams: Exam[] = [
 ];
 
 export default function ExamsPage() {
+  const { profile, checkAction, openPricingModal } = useUser();
   const [exams, setExams] = useState<Exam[]>(initialExams);
   const [showForm, setShowForm] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDate, setNewDate] = useState("");
 
   const addExam = () => {
+    if (exams.length >= 3 && !profile.isPro) {
+      openPricingModal();
+      return;
+    }
     if (!newTitle.trim() || !newDate) return;
     setExams((prev) =>
       [...prev, { id: Date.now(), title: newTitle.trim(), date: newDate }].sort(
@@ -64,7 +70,13 @@ export default function ExamsPage() {
       <div className="flex items-center justify-between">
         <p className="text-sm text-[#6b7280] dark:text-slate-400 transition-colors">{exams.length} upcoming exams</p>
         <button
-          onClick={() => setShowForm(!showForm)}
+          onClick={() => {
+            if (exams.length >= 3 && !profile.isPro) {
+                openPricingModal();
+                return;
+            }
+            setShowForm(!showForm);
+          }}
           className="flex items-center gap-1.5 rounded-lg bg-[#4f46e5] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#4338ca]"
         >
           <Plus className="h-4 w-4" />
@@ -104,7 +116,7 @@ export default function ExamsPage() {
 
       {/* Exam cards */}
       <div className="space-y-3">
-        {sorted.map((exam) => {
+        {sorted.map((exam, idx) => {
           const remaining = daysRemaining(exam.date);
           const isPast = remaining < 0;
           const isUrgent = remaining >= 0 && remaining <= 3;
@@ -117,28 +129,35 @@ export default function ExamsPage() {
             >
               <div className="flex items-center gap-4">
                 {/* Icon */}
-                <div
-                  className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
-                    isPast
-                      ? "bg-[#6b7280]/[0.08] dark:bg-slate-700/30"
-                      : isUrgent
-                        ? "bg-[#ef4444]/[0.08] dark:bg-red-500/20"
-                        : isSoon
-                          ? "bg-[#f59e0b]/[0.08] dark:bg-amber-500/20"
-                          : "bg-[#4f46e5]/[0.08] dark:bg-indigo-500/20"
-                  }`}
-                >
-                  <GraduationCap
-                    className={`h-5 w-5 transition-colors ${
+                <div className="relative">
+                  <div
+                    className={`flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
                       isPast
-                        ? "text-[#6b7280] dark:text-slate-500"
+                        ? "bg-[#6b7280]/[0.08] dark:bg-slate-700/30"
                         : isUrgent
-                          ? "text-[#ef4444] dark:text-red-400"
+                          ? "bg-[#ef4444]/[0.08] dark:bg-red-500/20"
                           : isSoon
-                            ? "text-[#f59e0b] dark:text-amber-400"
-                            : "text-[#4f46e5] dark:text-indigo-400"
+                            ? "bg-[#f59e0b]/[0.08] dark:bg-amber-500/20"
+                            : "bg-[#4f46e5]/[0.08] dark:bg-indigo-500/20"
                     }`}
-                  />
+                  >
+                    <GraduationCap
+                      className={`h-5 w-5 transition-colors ${
+                        isPast
+                          ? "text-[#6b7280] dark:text-slate-500"
+                          : isUrgent
+                            ? "text-[#ef4444] dark:text-red-400"
+                            : isSoon
+                              ? "text-[#f59e0b] dark:text-amber-400"
+                              : "text-[#4f46e5] dark:text-indigo-400"
+                      }`}
+                    />
+                  </div>
+                  {idx >= 3 && !profile.isPro && (
+                    <div className="absolute -top-2 -right-2 bg-white dark:bg-slate-900 rounded-full border border-amber-100 dark:border-amber-900/50 p-0.5">
+                        <Lock className="h-3 w-3 text-amber-500" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Info */}

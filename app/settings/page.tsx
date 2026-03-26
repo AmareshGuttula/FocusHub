@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Bell, Palette, Shield } from "lucide-react";
+import { User, Bell, Palette, LogOut, Crown, CreditCard } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import { usePomodoro } from "@/contexts/PomodoroContext";
+import { useRouter } from "next/navigation";
 
 const notificationToggles = [
   { id: "task_reminders", label: "Task reminders", description: "Get notified when a task is due", defaultEnabled: true },
@@ -12,30 +14,28 @@ const notificationToggles = [
 ];
 
 export default function SettingsPage() {
-  const { profile, updateProfile, openProfile } = useUser();
+  const { profile, updateProfile, openProfile, logout, openPricingModal } = useUser();
+  const { clearTimer } = usePomodoro();
+  const router = useRouter();
   
   // Local state for profile form
   const [name, setName] = useState(profile.name);
-  const [email, setEmail] = useState(profile.email);
-  const [university, setUniversity] = useState(profile.university);
   const [soundEnabled, setSoundEnabled] = useState(profile.soundEnabled);
   const [isSaving, setIsSaving] = useState(false);
 
   // Sync local state if profile contextual data changes via modal
   useEffect(() => {
     setName(profile.name);
-    setEmail(profile.email);
-    setUniversity(profile.university);
     setSoundEnabled(profile.soundEnabled);
   }, [profile]);
 
   const handleSaveProfile = () => {
     setIsSaving(true);
-    updateProfile({ name, email, university, soundEnabled });
+    updateProfile({ name, soundEnabled });
     setTimeout(() => {
       setIsSaving(false);
       showToast("Profile updated successfully!");
-    }, 600); // Simulate network request
+    }, 600);
   };
 
   const toggleToggle = (id: string) => {
@@ -51,6 +51,12 @@ export default function SettingsPage() {
   const showToast = (msg: string) => {
     setToastMsg(msg);
     setTimeout(() => setToastMsg(null), 3000);
+  };
+
+  const handleLogout = () => {
+    clearTimer();
+    logout();
+    router.push("/login");
   };
 
   return (
@@ -91,21 +97,12 @@ export default function SettingsPage() {
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-[#6b7280] dark:text-slate-400 mb-1">Email</label>
+            <label className="block text-xs font-medium text-[#6b7280] dark:text-slate-400 mb-1">Email (read-only)</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-[#e5e7eb] dark:border-slate-700 bg-[#f7f7f8] dark:bg-slate-800 px-3 py-2 text-sm text-[#111827] dark:text-slate-200 outline-none focus:border-[#4f46e5] dark:focus:border-indigo-500 focus:ring-1 focus:ring-[#4f46e5]/20 focus:bg-white dark:focus:bg-slate-900 transition-colors"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-[#6b7280] dark:text-slate-400 mb-1">University</label>
-            <input
-              type="text"
-              value={university}
-              onChange={(e) => setUniversity(e.target.value)}
-              className="w-full rounded-lg border border-[#e5e7eb] dark:border-slate-700 bg-[#f7f7f8] dark:bg-slate-800 px-3 py-2 text-sm text-[#111827] dark:text-slate-200 outline-none focus:border-[#4f46e5] dark:focus:border-indigo-500 focus:ring-1 focus:ring-[#4f46e5]/20 focus:bg-white dark:focus:bg-slate-900 transition-colors"
+              value={profile.email}
+              readOnly
+              className="w-full rounded-lg border border-[#e5e7eb] dark:border-slate-700 bg-[#f3f4f6] dark:bg-slate-800 px-3 py-2 text-sm text-[#9ca3af] dark:text-slate-500 outline-none cursor-not-allowed"
             />
           </div>
           <div>
@@ -133,6 +130,43 @@ export default function SettingsPage() {
           >
             {isSaving ? "Saving..." : "Save Changes"}
           </button>
+        </div>
+      </div>
+
+      {/* Plan */}
+      <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 transition-colors duration-300 shadow-soft">
+        <div className="flex items-center gap-2 mb-5">
+          <CreditCard className="h-4 w-4 text-[#6b7280] dark:text-slate-400" />
+          <h3 className="text-sm font-semibold text-[#111827] dark:text-slate-200">Plan</h3>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {profile.isPro ? (
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-md">
+                <Crown className="h-5 w-5" />
+              </div>
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#f3f4f6] dark:bg-slate-800 text-[#6b7280] dark:text-slate-400">
+                <CreditCard className="h-5 w-5" />
+              </div>
+            )}
+            <div>
+              <p className="text-sm font-semibold text-[#111827] dark:text-white">
+                {profile.isPro ? "Pro Plan" : "Free Plan"}
+              </p>
+              <p className="text-xs text-[#6b7280] dark:text-slate-400">
+                {profile.isPro ? "All features unlocked" : "5 tasks per day · Limited features"}
+              </p>
+            </div>
+          </div>
+          {!profile.isPro && (
+            <button
+              onClick={openPricingModal}
+              className="px-4 py-2 bg-gradient-to-r from-violet-600 to-indigo-600 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:shadow-violet-500/20 transition-all"
+            >
+              Upgrade
+            </button>
+          )}
         </div>
       </div>
 
@@ -210,28 +244,20 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Account */}
+      {/* Logout */}
       <div className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 transition-colors duration-300 shadow-soft">
-        <div className="flex items-center gap-2 mb-4">
-          <Shield className="h-4 w-4 text-[#6b7280] dark:text-slate-400" />
-          <h3 className="text-sm font-semibold text-[#111827] dark:text-slate-200">Account</h3>
-        </div>
-        <div className="space-y-3">
-          <button onClick={() => showToast("Password reset link sent to your email.")} className="w-full rounded-lg border border-[#e5e7eb] dark:border-slate-700 px-4 py-2.5 text-sm font-medium text-[#111827] dark:text-slate-200 hover:bg-[#f7f7f8] dark:hover:bg-slate-800 transition-colors text-left">
-            Change Password
-          </button>
-          <button onClick={() => showToast("Account data exported to email.")} className="w-full rounded-lg border border-[#e5e7eb] dark:border-slate-700 px-4 py-2.5 text-sm font-medium text-[#111827] dark:text-slate-200 hover:bg-[#f7f7f8] dark:hover:bg-slate-800 transition-colors text-left">
-            Export Data
-          </button>
-          <button onClick={() => showToast("Account deletion request received.")} className="w-full rounded-lg border border-[#fecaca] dark:border-red-500/30 bg-[rgba(239,68,68,0.04)] dark:bg-red-500/10 px-4 py-2.5 text-sm font-medium text-[#ef4444] hover:bg-[rgba(239,68,68,0.08)] dark:hover:bg-red-500/20 transition-colors text-left">
-            Delete Account
-          </button>
-        </div>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 rounded-lg border border-[#fecaca] dark:border-red-500/30 bg-[rgba(239,68,68,0.04)] dark:bg-red-500/10 px-4 py-2.5 text-sm font-medium text-[#ef4444] hover:bg-[rgba(239,68,68,0.08)] dark:hover:bg-red-500/20 transition-colors"
+        >
+          <LogOut className="h-4 w-4" />
+          Logout
+        </button>
       </div>
 
       {toastMsg && (
         <div className="fixed bottom-6 right-6 z-50 flex animate-bounce-in items-center gap-2 rounded-xl bg-[#111827] px-4 py-3 text-sm font-medium text-white shadow-xl">
-          <Shield className="h-4 w-4 text-[#10b981]" />
+          <User className="h-4 w-4 text-[#10b981]" />
           {toastMsg}
         </div>
       )}

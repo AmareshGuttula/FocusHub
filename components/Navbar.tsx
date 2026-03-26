@@ -2,8 +2,9 @@
 
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Search, Bell, CheckCircle2, AlertTriangle, Info, Clock, Moon, Sun, Menu } from "lucide-react";
+import { Bell, CheckCircle2, AlertTriangle, Info, Clock, Moon, Sun, Menu, Crown } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
+import Link from "next/link";
 
 interface Notification {
   id: number;
@@ -94,16 +95,6 @@ export default function Navbar() {
 
       {/* Right — Actions */}
       <div className="flex items-center gap-2 lg:gap-3">
-        {/* Search bar — hidden on mobile */}
-        <div className="relative hidden lg:block">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#9ca3af] dark:text-slate-400" />
-          <input
-            type="text"
-            placeholder="Search..."
-            className="h-9 w-52 rounded-lg border border-[#e5e7eb] dark:border-slate-700 bg-[#f7f7f8] dark:bg-slate-800 pl-9 pr-3 text-sm text-[#111827] dark:text-slate-200 placeholder-[#9ca3af] dark:placeholder-slate-500 outline-none transition-colors focus:border-[#4f46e5] focus:bg-white dark:focus:bg-slate-900 focus:ring-1 focus:ring-[#4f46e5]/20"
-          />
-        </div>
-
         {/* Theme Toggle */}
         <button
           onClick={() => {
@@ -192,13 +183,31 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* User avatar */}
-        <button 
-          onClick={openProfile}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3f4f6] dark:bg-slate-700 text-lg transition-transform hover:scale-110 shadow-sm"
-        >
-          {profile.avatar}
-        </button>
+        {/* User Profile / Sign In */}
+        {!profile.isLoggedIn ? (
+          <Link
+            href="/login"
+            className="flex h-9 items-center gap-2 rounded-lg bg-[#111827] dark:bg-white px-4 text-xs font-semibold text-white dark:text-[#111827] transition-transform hover:scale-[1.02] active:scale-95 shadow-sm"
+          >
+            Sign In
+          </Link>
+        ) : (
+          <button 
+            onClick={openProfile}
+            className="flex items-center gap-2"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3f4f6] dark:bg-slate-700 text-lg transition-transform hover:scale-110 shadow-sm">
+              {profile.avatar}
+            </div>
+            {/* PRO badge */}
+            {profile.isPro && (
+              <span className="hidden lg:flex items-center gap-1 px-2 py-0.5 bg-gradient-to-r from-violet-500 to-indigo-600 text-white text-[10px] font-bold uppercase tracking-wider rounded-full">
+                <Crown className="w-3 h-3" />
+                PRO
+              </span>
+            )}
+          </button>
+        )}
       </div>
     </header>
   );

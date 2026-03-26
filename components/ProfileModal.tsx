@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/contexts/UserContext";
-import { X, User, Mail, Sparkles } from "lucide-react";
+import { X, User, Mail, Sparkles, Lock } from "lucide-react";
 
 const animalAvatars = [
   "🐶", "🐱", "🐭", "🐹", "🐰", "🦊", 
@@ -14,14 +14,12 @@ export default function ProfileModal() {
   const { profile, isProfileOpen, closeProfile, updateProfile } = useUser();
   
   const [name, setName] = useState(profile.name);
-  const [email, setEmail] = useState(profile.email);
   const [avatar, setAvatar] = useState(profile.avatar);
 
   // Sync state when opened
   useEffect(() => {
     if (isProfileOpen) {
       setName(profile.name);
-      setEmail(profile.email);
       setAvatar(profile.avatar);
     }
   }, [isProfileOpen, profile]);
@@ -29,7 +27,7 @@ export default function ProfileModal() {
   if (!isProfileOpen) return null;
 
   const handleSave = () => {
-    updateProfile({ name, email, avatar });
+    updateProfile({ name, avatar });
     closeProfile();
   };
 
@@ -80,6 +78,7 @@ export default function ProfileModal() {
             </div>
           </div>
 
+          {/* Name — Editable */}
           <div>
             <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-[#6b7280] dark:text-slate-400 transition-colors duration-300">
               <User className="h-3.5 w-3.5" /> Display Name
@@ -92,15 +91,17 @@ export default function ProfileModal() {
             />
           </div>
 
+          {/* Email — Read Only */}
           <div>
             <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-[#6b7280] dark:text-slate-400 transition-colors duration-300">
               <Mail className="h-3.5 w-3.5" /> Email Address
+              <Lock className="h-3 w-3 text-[#9ca3af]" />
             </label>
             <input
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-lg border border-[#e5e7eb] dark:border-slate-700 bg-[#f7f7f8] dark:bg-slate-900/50 px-3.5 py-2.5 text-sm text-[#111827] dark:text-slate-200 outline-none transition-colors focus:border-[#4f46e5] dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-800 focus:ring-1 focus:ring-[#4f46e5]/20"
-              placeholder="e.g. email@university.edu"
+              value={profile.email}
+              readOnly
+              className="w-full rounded-lg border border-[#e5e7eb] dark:border-slate-700 bg-[#f3f4f6] dark:bg-slate-800 px-3.5 py-2.5 text-sm text-[#9ca3af] dark:text-slate-500 outline-none cursor-not-allowed"
+              placeholder="Email cannot be changed"
             />
           </div>
         </div>

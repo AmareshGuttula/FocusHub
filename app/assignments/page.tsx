@@ -1,4 +1,7 @@
-import { ClipboardList } from "lucide-react";
+"use client";
+
+import { ClipboardList, Lock } from "lucide-react";
+import { useUser } from "@/contexts/UserContext";
 
 interface Assignment {
   id: number;
@@ -34,6 +37,8 @@ const subjectColors: Record<string, string> = {
 };
 
 export default function AssignmentsPage() {
+  const { profile, checkAction, openPricingModal } = useUser();
+
   return (
     <div className="mx-auto max-w-4xl space-y-6">
       <div>
@@ -44,20 +49,40 @@ export default function AssignmentsPage() {
       </div>
 
       <div className="space-y-3">
-        {assignments.map((a) => {
+        {assignments.map((a, idx) => {
           const st = statusStyles[a.status];
           const subjectColor = subjectColors[a.subject] || "#6b7280";
+          
+          const handleAssignmentClick = () => {
+             if (idx >= 4) {
+                 checkAction(openPricingModal, true);
+             }
+          };
+
           return (
             <div
               key={a.id}
-              className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 transition-all duration-200 hover:shadow-card hover:border-[#d1d5db] dark:hover:border-slate-700"
+              onClick={handleAssignmentClick}
+              className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 p-5 transition-all duration-200 hover:shadow-card hover:border-[#d1d5db] dark:hover:border-slate-700 cursor-pointer relative"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-3">
-                  <div
-                    className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg"
-                    style={{ backgroundColor: `${subjectColor}14` }}
-                  >
+                  <div className="relative">
+                    <div
+                      className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg"
+                      style={{ backgroundColor: `${subjectColor}14` }}
+                    >
+                      <ClipboardList
+                        className="h-4 w-4"
+                        style={{ color: subjectColor }}
+                      />
+                    </div>
+                    {idx >= 4 && !profile.isPro && (
+                      <div className="absolute -top-2 -right-2 bg-white dark:bg-slate-900 rounded-full border border-amber-100 dark:border-amber-900/50 p-0.5">
+                          <Lock className="h-3 w-3 text-amber-500" />
+                      </div>
+                    )}
+                  </div>
                     <ClipboardList
                       className="h-4 w-4"
                       style={{ color: subjectColor }}

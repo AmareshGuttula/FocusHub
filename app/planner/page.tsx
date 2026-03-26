@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Plus, Trash2, GripVertical, X, Clock, ChevronLeft, ChevronRight } from "lucide-react";
+import ProFeatureLock from "@/components/ProFeatureLock";
 
 interface StudyBlock {
   id: number;
@@ -16,28 +17,7 @@ const colors = ["#4f46e5", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"
 
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-const initialPlan: WeekPlan = {
-  Monday: [
-    { id: 1, subject: "Math", hours: 2, color: "#4f46e5" },
-    { id: 2, subject: "Physics", hours: 1, color: "#ef4444" },
-  ],
-  Tuesday: [
-    { id: 3, subject: "Biology", hours: 1.5, color: "#10b981" },
-    { id: 4, subject: "English", hours: 1, color: "#06b6d4" },
-  ],
-  Wednesday: [
-    { id: 5, subject: "Computer Science", hours: 2, color: "#8b5cf6" },
-  ],
-  Thursday: [
-    { id: 6, subject: "Chemistry", hours: 1.5, color: "#f59e0b" },
-    { id: 7, subject: "Math", hours: 1, color: "#4f46e5" },
-  ],
-  Friday: [
-    { id: 8, subject: "Physics", hours: 2, color: "#ef4444" },
-  ],
-  Saturday: [],
-  Sunday: [],
-};
+const initialPlan: WeekPlan = {}; // Start empty or with specific dates if needed
 
 export default function PlannerPage() {
   const [plan, setPlan] = useState<WeekPlan>(initialPlan);
@@ -61,6 +41,15 @@ export default function PlannerPage() {
   const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
   const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay();
 
+  const getDateKey = (y: number, m: number, d: number) => {
+    return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  };
+
+  const getDayName = (y: number, m: number, d: number) => {
+    const dateObj = new Date(y, m, d);
+    return days[dateObj.getDay() === 0 ? 6 : dateObj.getDay() - 1];
+  };
+
   const prevMonth = () => {
     if (calMonth === 0) { setCalMonth(11); setCalYear((y) => y - 1); }
     else setCalMonth((m) => m - 1);
@@ -70,26 +59,26 @@ export default function PlannerPage() {
     else setCalMonth((m) => m + 1);
   };
 
-  const getDayName = (date: number) => {
+  const getDayNameFromDate = (date: number) => {
     const d = new Date(calYear, calMonth, date);
     return days[d.getDay() === 0 ? 6 : d.getDay() - 1]; // Convert Sun=0 to our Mon-Sun list
   };
 
   const getDotsForDate = (date: number) => {
-    const dayName = getDayName(date);
-    return plan[dayName] || [];
+    const key = getDateKey(calYear, calMonth, date);
+    return plan[key] || [];
   };
 
   const isToday = (date: number) =>
     date === today.getDate() && calMonth === today.getMonth() && calYear === today.getFullYear();
 
-  const addBlock = (day: string) => {
+  const addBlock = (dateKey: string) => {
     if (!newSubject.trim()) return;
     const colorIndex = Object.values(plan).flat().length % colors.length;
     setPlan((prev) => ({
       ...prev,
-      [day]: [
-        ...prev[day],
+      [dateKey]: [
+        ...(prev[dateKey] || []),
         { id: Date.now(), subject: newSubject.trim(), hours: Math.max(0.5, Number(newHours) || 1), color: colors[colorIndex] },
       ],
     }));
@@ -98,39 +87,39 @@ export default function PlannerPage() {
     setAddingDay(null);
   };
 
-  const removeBlock = (day: string, id: number) => {
+  const removeBlock = (dateKey: string, id: number) => {
     setPlan((prev) => ({
       ...prev,
-      [day]: prev[day].filter((b) => b.id !== id),
+      [dateKey]: (prev[dateKey] || []).filter((b) => b.id !== id),
     }));
   };
 
-  const handleDragStart = (day: string, index: number) => {
-    dragItem.current = { day, index };
+  const handleDragStart = (dateKey: string, index: number) => {
+    dragItem.current = { day: dateKey, index };
   };
 
-  const handleDragEnter = (day: string, index: number) => {
-    dragOverItem.current = { day, index };
+  const handleDragEnter = (dateKey: string, index: number) => {
+    dragOverItem.current = { day: dateKey, index };
   };
 
   const handleDragEnd = () => {
     if (!dragItem.current || !dragOverItem.current) return;
-    const { day: fromDay, index: fromIndex } = dragItem.current;
-    const { day: toDay, index: toIndex } = dragOverItem.current;
+    const { day: fromKey, index: fromIndex } = dragItem.current;
+    const { day: toKey, index: toIndex } = dragOverItem.current;
 
     setPlan((prev) => {
       const updated = { ...prev };
-      const fromList = [...updated[fromDay]];
+      const fromList = [...(updated[fromKey] || [])];
       const [moved] = fromList.splice(fromIndex, 1);
 
-      if (fromDay === toDay) {
+      if (fromKey === toKey) {
         fromList.splice(toIndex, 0, moved);
-        updated[fromDay] = fromList;
+        updated[fromKey] = fromList;
       } else {
-        updated[fromDay] = fromList;
-        const toList = [...updated[toDay]];
+        updated[fromKey] = fromList;
+        const toList = [...(updated[toKey] || [])];
         toList.splice(toIndex, 0, moved);
-        updated[toDay] = toList;
+        updated[toKey] = toList;
       }
       return updated;
     });
@@ -139,18 +128,39 @@ export default function PlannerPage() {
     dragOverItem.current = null;
   };
 
-  const totalHours = (day: string) =>
-    plan[day].reduce((sum, b) => sum + b.hours, 0);
+  const totalHours = (dateKey: string) =>
+    (plan[dateKey] || []).reduce((sum, b) => sum + b.hours, 0);
 
-  const weekTotal = days.reduce((sum, day) => sum + totalHours(day), 0);
+  // Get dates for the current week starting from the Monday of the current selected month/date
+  const getWeekDates = () => {
+    const d = new Date(calYear, calMonth, selectedDate);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    const monday = new Date(d.setDate(diff));
+    
+    return Array.from({ length: 7 }).map((_, i) => {
+        const date = new Date(monday);
+        date.setDate(monday.getDate() + i);
+        return date;
+    });
+  };
+
+  const weekDates = getWeekDates();
+  const weekTotal = weekDates.reduce((sum, date) => {
+      const key = getDateKey(date.getFullYear(), date.getMonth(), date.getDate());
+      return sum + totalHours(key);
+  }, 0);
 
   // Selected date info
-  const selectedDayName = getDayName(selectedDate);
-  const selectedBlocks = plan[selectedDayName] || [];
+  const selectedDateKey = getDateKey(calYear, calMonth, selectedDate);
+  const selectedDayName = getDayNameFromDate(selectedDate);
+  const selectedBlocks = plan[selectedDateKey] || [];
 
   return (
-    <div className="mx-auto max-w-6xl space-y-5">
-      {/* Calendar + selected day info */}
+    <ProFeatureLock>
+      <div className="mx-auto max-w-6xl space-y-5">
+        {/* Calendar + selected day info */}
+
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         {/* Monthly calendar */}
         <div className="lg:col-span-2 rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft p-5">
@@ -258,25 +268,45 @@ export default function PlannerPage() {
         </p>
       </div>
 
-      {/* Day cards */}
+      {/* Day cards (Weekly view for selected week) */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {days.map((day) => {
-          const hours = totalHours(day);
-          const isAdding = addingDay === day;
-          const isWeekend = day === "Saturday" || day === "Sunday";
+        {weekDates.map((dateObj) => {
+          const key = getDateKey(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+          const dayName = days[dateObj.getDay() === 0 ? 6 : dateObj.getDay() - 1];
+          const dateNum = dateObj.getDate();
+          const monthShort = monthNames[dateObj.getMonth()].slice(0, 3);
+          
+          const hours = totalHours(key);
+          const isAdding = addingDay === key;
+          const isWeekend = dayName === "Saturday" || dayName === "Sunday";
+          const isSelected = selectedDate === dateNum && calMonth === dateObj.getMonth() && calYear === dateObj.getFullYear();
+
           return (
             <div
-              key={day}
-              className="rounded-xl border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft"
+              key={key}
+              className={`rounded-xl border transition-all ${
+                isSelected 
+                  ? "border-[#4f46e5] ring-1 ring-[#4f46e5]/20 bg-white dark:bg-slate-900 shadow-lg" 
+                  : "border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-soft"
+              }`}
               onDragOver={(e) => e.preventDefault()}
               onDrop={handleDragEnd}
             >
               {/* Day header */}
               <div className="flex items-center justify-between border-b border-[#f3f4f6] dark:border-slate-800/50 px-4 py-3">
-                <div>
-                  <h3 className={`text-sm font-semibold ${isWeekend ? "text-[#9ca3af] dark:text-slate-500" : "text-[#111827] dark:text-slate-200"}`}>
-                    {day}
-                  </h3>
+                <div className="cursor-pointer" onClick={() => {
+                    setCalMonth(dateObj.getMonth());
+                    setCalYear(dateObj.getFullYear());
+                    setSelectedDate(dateNum);
+                }}>
+                  <div className="flex items-center gap-2">
+                    <h3 className={`text-sm font-semibold ${isWeekend ? "text-[#9ca3af] dark:text-slate-500" : "text-[#111827] dark:text-slate-200"}`}>
+                        {dayName}
+                    </h3>
+                    <span className="text-[10px] font-bold text-[#9ca3af] uppercase tracking-tighter">
+                        {monthShort} {dateNum}
+                    </span>
+                  </div>
                   {hours > 0 && (
                     <p className="flex items-center gap-1 text-[11px] text-[#9ca3af] dark:text-slate-500 mt-0.5">
                       <Clock className="h-3 w-3" />
@@ -285,7 +315,7 @@ export default function PlannerPage() {
                   )}
                 </div>
                 <button
-                  onClick={() => { setAddingDay(isAdding ? null : day); setNewSubject(""); setNewHours("1"); }}
+                  onClick={() => { setAddingDay(isAdding ? null : key); setNewSubject(""); setNewHours("1"); }}
                   className={`flex h-7 w-7 items-center justify-center rounded-md transition-colors ${
                     isAdding
                       ? "bg-[#4f46e5]/[0.08] dark:bg-indigo-500/20 text-[#4f46e5]"
@@ -298,12 +328,12 @@ export default function PlannerPage() {
 
               {/* Blocks */}
               <div className="p-2 space-y-1.5 min-h-[60px]">
-                {plan[day].map((block, idx) => (
+                {(plan[key] || []).map((block, idx) => (
                   <div
                     key={block.id}
                     draggable
-                    onDragStart={() => handleDragStart(day, idx)}
-                    onDragEnter={() => handleDragEnter(day, idx)}
+                    onDragStart={() => handleDragStart(key, idx)}
+                    onDragEnter={() => handleDragEnter(key, idx)}
                     className="group flex items-center gap-2 rounded-lg px-2.5 py-2 transition-colors hover:bg-[#fafafa] dark:hover:bg-slate-800/50 cursor-grab active:cursor-grabbing"
                   >
                     <GripVertical className="h-3.5 w-3.5 flex-shrink-0 text-[#d1d5db] dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -316,7 +346,7 @@ export default function PlannerPage() {
                     </span>
                     <span className="text-xs text-[#9ca3af] dark:text-slate-500">{block.hours}h</span>
                     <button
-                      onClick={() => removeBlock(day, block.id)}
+                      onClick={() => removeBlock(key, block.id)}
                       className="text-[#d1d5db] dark:text-slate-600 opacity-0 group-hover:opacity-100 transition-all hover:text-[#ef4444]"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
@@ -324,7 +354,7 @@ export default function PlannerPage() {
                   </div>
                 ))}
 
-                {plan[day].length === 0 && !isAdding && (
+                {(plan[key] || []).length === 0 && !isAdding && (
                   <p className="py-3 text-center text-xs text-[#d1d5db] dark:text-slate-600">No subjects</p>
                 )}
 
@@ -334,7 +364,7 @@ export default function PlannerPage() {
                     <input
                       value={newSubject}
                       onChange={(e) => setNewSubject(e.target.value)}
-                      onKeyDown={(e) => e.key === "Enter" && addBlock(day)}
+                      onKeyDown={(e) => e.key === "Enter" && addBlock(key)}
                       placeholder="Subject name..."
                       className="w-full rounded-md border border-[#e5e7eb] dark:border-slate-800 bg-white dark:bg-slate-900 px-2.5 py-1.5 text-sm text-[#111827] dark:text-slate-200 placeholder-[#9ca3af] outline-none focus:border-[#4f46e5] focus:ring-1 focus:ring-[#4f46e5]/20"
                       autoFocus
@@ -352,7 +382,7 @@ export default function PlannerPage() {
                         <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-[#9ca3af] dark:text-slate-500">hrs</span>
                       </div>
                       <button
-                        onClick={() => addBlock(day)}
+                        onClick={() => addBlock(key)}
                         className="rounded-md bg-[#4f46e5] px-3 py-1.5 text-xs font-medium text-white hover:bg-[#4338ca] transition-colors"
                       >
                         Add
@@ -365,6 +395,7 @@ export default function PlannerPage() {
           );
         })}
       </div>
-    </div>
+      </div>
+    </ProFeatureLock>
   );
 }
